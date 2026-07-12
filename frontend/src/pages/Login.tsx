@@ -24,30 +24,34 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#0B0B0F] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-sans">
+      {/* Decorative background glows */}
+      <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-red-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+      <div className="max-w-md w-full bg-[#16161A] border border-white/5 rounded-3xl p-8 shadow-2xl relative z-10 space-y-8">
         <div>
-          <div className="flex justify-center">
-            <Truck className="h-12 w-12 text-gray-900 dark:text-white" />
+          <div className="w-16 h-16 rounded-2xl bg-[#0B0B0F] border border-white/10 flex items-center justify-center mx-auto mb-4 shadow-inner">
+            <Truck className="h-8 w-8 text-white" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+          <h2 className="text-center text-3xl font-extrabold tracking-tight text-white">
             TransitOps
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Transport Operations Management System
+          <p className="mt-2 text-center text-xs text-gray-500 uppercase tracking-widest font-semibold">
+            Transport Operations System
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-md text-sm">
+            <div className="bg-[#FF3333]/10 border border-[#FF3333]/20 text-[#FF3333] px-4 py-3 rounded-2xl text-xs font-semibold text-center">
               {error}
             </div>
           )}
 
-          <div className="rounded-md shadow-sm space-y-4">
+          <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="email" className="block text-xs font-medium text-gray-500 uppercase tracking-widest mb-1.5">
                 Email address
               </label>
               <input
@@ -58,13 +62,13 @@ export default function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 sm:text-sm bg-white dark:bg-gray-800"
+                className="w-full px-4 py-3 bg-[#0B0B0F] border border-white/5 placeholder-gray-600 text-white rounded-2xl focus:outline-none focus:border-white/20 focus:ring-0 transition-colors text-sm"
                 placeholder="admin@transitops.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="password" className="block text-xs font-medium text-gray-500 uppercase tracking-widest mb-1.5">
                 Password
               </label>
               <input
@@ -75,7 +79,7 @@ export default function Login() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 sm:text-sm bg-white dark:bg-gray-800"
+                className="w-full px-4 py-3 bg-[#0B0B0F] border border-white/5 placeholder-gray-600 text-white rounded-2xl focus:outline-none focus:border-white/20 focus:ring-0 transition-colors text-sm"
                 placeholder="••••••••"
               />
             </div>
@@ -85,15 +89,15 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-900 dark:bg-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3.5 px-4 bg-white text-black text-sm font-bold rounded-2xl hover:bg-white/90 transition-all shadow-[0_4px_20px_rgba(255,255,255,0.15)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
 
-          <div className="text-sm text-center text-gray-600 dark:text-gray-400">
-            <p>Demo credentials:</p>
-            <p className="mt-1">admin@transitops.com / admin123</p>
+          <div className="bg-[#0B0B0F] rounded-2xl p-4 border border-white/5 text-center text-xs text-gray-500 space-y-1">
+            <p className="font-semibold text-gray-400">Demo credentials:</p>
+            <p>admin@transitops.com / admin123</p>
           </div>
         </form>
       </div>
