@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import UsersPage from './pages/Users';
 import Vehicles from './pages/Vehicles';
 import Drivers from './pages/Drivers';
 import Trips from './pages/Trips';
@@ -14,7 +15,7 @@ import './index.css';
 
 const queryClient = new QueryClient();
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
@@ -27,6 +28,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/" replace />;
   }
 
   return <Layout>{children}</Layout>;
@@ -47,9 +52,17 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/users"
+        element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <UsersPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/vehicles"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['ADMIN', 'FLEET_MANAGER']}>
             <Vehicles />
           </ProtectedRoute>
         }
@@ -57,7 +70,7 @@ function AppRoutes() {
       <Route
         path="/drivers"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['ADMIN', 'SAFETY_OFFICER']}>
             <Drivers />
           </ProtectedRoute>
         }
@@ -65,7 +78,7 @@ function AppRoutes() {
       <Route
         path="/trips"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['ADMIN', 'DISPATCHER']}>
             <Trips />
           </ProtectedRoute>
         }
@@ -73,7 +86,7 @@ function AppRoutes() {
       <Route
         path="/maintenance"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['ADMIN', 'FLEET_MANAGER']}>
             <Maintenance />
           </ProtectedRoute>
         }
@@ -81,7 +94,7 @@ function AppRoutes() {
       <Route
         path="/fuel-expenses"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['ADMIN', 'FLEET_MANAGER', 'FINANCIAL_ANALYST']}>
             <FuelExpenses />
           </ProtectedRoute>
         }
@@ -89,7 +102,7 @@ function AppRoutes() {
       <Route
         path="/reports"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['ADMIN', 'FINANCIAL_ANALYST']}>
             <Reports />
           </ProtectedRoute>
         }

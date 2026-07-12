@@ -209,4 +209,23 @@ export const reportApi = {
   },
 };
 
+// User API
+export const userApi = {
+  getAll: async (): Promise<User[]> => {
+    const { data } = await api.get('/users');
+    return data;
+  },
+  create: async (user: Partial<User> & { password?: string }): Promise<User> => {
+    const { data } = await api.post('/users', user);
+    return data;
+  },
+  update: async (id: string, user: Partial<User> & { password?: string }): Promise<User> => {
+    const { data } = await api.put(`/users/${id}`, user);
+    return data;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/users/${id}`);
+  },
+};
+
 export default api;

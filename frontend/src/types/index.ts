@@ -13,6 +13,7 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
+  isActive: boolean;
   createdAt?: string;
 }
 
@@ -32,6 +33,7 @@ export interface Vehicle {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  trips?: (Trip & { driver: Driver })[];
 }
 
 export interface Driver {

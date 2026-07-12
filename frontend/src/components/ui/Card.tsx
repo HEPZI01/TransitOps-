@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface CardProps {
   children: ReactNode;
@@ -7,7 +7,7 @@ interface CardProps {
 
 export function Card({ children, className = '' }: CardProps) {
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`bg-white/90 dark:bg-white-[0.02] backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 dark:border-white/10 ${className}`}>
       {children}
     </div>
   );
@@ -20,7 +20,7 @@ interface CardHeaderProps {
 
 export function CardHeader({ children, className = '' }: CardHeaderProps) {
   return (
-    <div className={`px-6 py-4 border-b border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`px-6 py-5 border-b border-gray-200/50 dark:border-white/10 ${className}`}>
       {children}
     </div>
   );

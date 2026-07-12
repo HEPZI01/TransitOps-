@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import {
@@ -12,143 +12,132 @@ import {
   LogOut,
   Menu,
   X,
+  Shield,
+  Settings,
+  Bell
 } from 'lucide-react';
 import { useState } from 'react';
-
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Vehicles', href: '/vehicles', icon: Car },
-  { name: 'Drivers', href: '/drivers', icon: Users },
-  { name: 'Trips', href: '/trips', icon: Route },
-  { name: 'Maintenance', href: '/maintenance', icon: Wrench },
-  { name: 'Fuel & Expenses', href: '/fuel-expenses', icon: Fuel },
-  { name: 'Reports', href: '/reports', icon: BarChart3 },
-];
+import { AnimatePresence } from 'framer-motion';
+import { PageTransition } from './ui/PageTransition';
 
 export default function Layout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navigation = [
+    { name: 'Dashboard', href: '/', icon: LayoutDashboard, roles: ['ADMIN', 'FLEET_MANAGER', 'SAFETY_OFFICER', 'DISPATCHER', 'FINANCIAL_ANALYST'] },
+    { name: 'Users', href: '/users', icon: Shield, roles: ['ADMIN'] },
+    { name: 'Vehicles', href: '/vehicles', icon: Car, roles: ['ADMIN', 'FLEET_MANAGER'] },
+    { name: 'Drivers', href: '/drivers', icon: Users, roles: ['ADMIN', 'SAFETY_OFFICER'] },
+    { name: 'Trips', href: '/trips', icon: Route, roles: ['ADMIN', 'DISPATCHER'] },
+    { name: 'Maintenance', href: '/maintenance', icon: Wrench, roles: ['ADMIN', 'FLEET_MANAGER'] },
+    { name: 'Expenses', href: '/fuel-expenses', icon: Fuel, roles: ['ADMIN', 'FLEET_MANAGER', 'FINANCIAL_ANALYST'] },
+    { name: 'Reports', href: '/reports', icon: BarChart3, roles: ['ADMIN', 'FINANCIAL_ANALYST'] },
+  ].filter(item => user && item.roles.includes(user.role));
+
+  const roleClasses: Record<string, string> = {
+    ADMIN: 'role-admin',
+    FLEET_MANAGER: 'role-fm',
+    SAFETY_OFFICER: 'role-safety',
+    DISPATCHER: 'role-dispatch',
+    FINANCIAL_ANALYST: 'role-finance',
+  };
+  const roleClass = user ? roleClasses[user.role] : '';
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-      {/* Mobile sidebar */}
-      <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
-        <div
-          className="fixed inset-0 bg-gray-600 bg-opacity-75"
-          onClick={() => setSidebarOpen(false)}
-        />
-        <div className="fixed inset-y-0 left-0 flex flex-col w-64 bg-white dark:bg-gray-800">
-          <div className="flex items-center justify-between h-16 px-4 border-b">
-            <span className="text-xl font-bold text-gray-900 dark:text-white">TransitOps</span>
-            <button onClick={() => setSidebarOpen(false)} className="text-gray-500">
-              <X size={24} />
-            </button>
-          </div>
-          <nav className="flex-1 px-2 py-4 space-y-1">
-            {navigation.map((item) => {
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                    isActive
-                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <item.icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="p-4 border-t">
-            <div className="flex items-center mb-3">
-              <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {user?.name?.charAt(0) || 'U'}
-                </span>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{user?.name}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{user?.role}</p>
-              </div>
+    <div className={`min-h-screen ${roleClass} dark-force bg-background font-sans text-foreground`}>
+      {/* Top Navigation Bar */}
+      <nav className="sticky top-0 z-50 bg-[#0B0B0F]/90 backdrop-blur-xl border-b border-white/5 py-3 px-6 flex items-center justify-between">
+        
+        {/* Left: Logo */}
+        <div className="flex items-center gap-2">
+          <span className="text-xl font-bold tracking-tight text-white">TransitOps</span>
+        </div>
+
+        {/* Center: Nav Pills (Desktop) */}
+        <div className="hidden lg:flex items-center gap-2 bg-[#16161A] p-1.5 rounded-full border border-white/5 shadow-inner">
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                  isActive 
+                    ? 'bg-white text-black shadow-sm' 
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                {item.name}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Right: Actions */}
+        <div className="hidden lg:flex items-center gap-4">
+          <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-black hover:bg-gray-200 transition-colors">
+            <Settings size={18} strokeWidth={2.5} />
+          </button>
+          <button className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-black hover:bg-gray-200 transition-colors">
+            <Bell size={18} strokeWidth={2.5} />
+          </button>
+          
+          <div className="flex items-center gap-3 bg-[#16161A] pl-1 pr-4 py-1 rounded-full border border-white/5">
+            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-white text-xs font-bold">
+               {user?.name?.substring(0, 2).toUpperCase() || 'U'}
             </div>
-            <button
-              onClick={logout}
-              className="flex items-center w-full px-2 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
-            >
-              <LogOut className="mr-3 h-5 w-5" />
-              Logout
+            <button onClick={logout} className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
+              <LogOut size={16} />
             </button>
           </div>
         </div>
-      </div>
+        
+        {/* Mobile Menu Toggle */}
+        <div className="lg:hidden">
+          <button onClick={() => setMobileMenuOpen(true)} className="text-white">
+            <Menu size={24} />
+          </button>
+        </div>
+      </nav>
 
-      {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-          <div className="flex items-center h-16 px-4 border-b">
-            <span className="text-xl font-bold text-gray-900 dark:text-white">TransitOps</span>
+      {/* Mobile Menu Overlay */}
+      <div className={`fixed inset-0 z-50 lg:hidden ${mobileMenuOpen ? 'block' : 'hidden'}`}>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
+        <div className="fixed inset-y-0 right-0 w-64 bg-[#16161A] border-l border-white/10 p-6 flex flex-col gap-6">
+          <div className="flex justify-between items-center">
+            <span className="font-bold text-white">Menu</span>
+            <button onClick={() => setMobileMenuOpen(false)} className="text-gray-400 hover:text-white"><X size={24}/></button>
           </div>
-          <nav className="flex-1 px-2 py-4 space-y-1">
-            {navigation.map((item) => {
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                    isActive
-                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <item.icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="p-4 border-t">
-            <div className="flex items-center mb-3">
-              <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {user?.name?.charAt(0) || 'U'}
-                </span>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{user?.name}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{user?.role}</p>
-              </div>
-            </div>
-            <button
-              onClick={logout}
-              className="flex items-center w-full px-2 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
-            >
-              <LogOut className="mr-3 h-5 w-5" />
-              Logout
+          <div className="flex flex-col gap-2">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`px-4 py-3 rounded-xl font-medium ${location.pathname === item.href ? 'bg-white text-black' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+          <div className="mt-auto border-t border-white/10 pt-6">
+            <button onClick={logout} className="flex items-center gap-3 text-red-500 hover:text-red-400 font-medium">
+              <LogOut size={20} /> Logout
             </button>
           </div>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
-        <div className="sticky top-0 z-40 flex items-center h-16 px-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 lg:hidden">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="text-gray-500 hover:text-gray-600"
-          >
-            <Menu size={24} />
-          </button>
-          <span className="ml-3 text-xl font-bold text-gray-900 dark:text-white">TransitOps</span>
-        </div>
-        <main className="p-6">{children}</main>
-      </div>
+      <main className="p-6 max-w-7xl mx-auto w-full">
+        <AnimatePresence mode="wait">
+          <PageTransition key={location.pathname}>
+            {children}
+          </PageTransition>
+        </AnimatePresence>
+      </main>
     </div>
   );
 }
